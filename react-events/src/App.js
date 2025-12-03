@@ -3,7 +3,7 @@ import { useState } from 'react';
 import Delivery from './Delivery';
 
 function App() {
-  const [id, setId] = useState('')
+  const [id, setId] = useState('01KBHVPC0XBQN2WNC66BGVV4Z2')
   const submit = async (e) => {
     e.preventDefault(); 
     const form = new FormData(e.target);
@@ -36,7 +36,7 @@ function App() {
             </div>
             <button className='btn btn-primary'>Submit</button>
           </form>
-        </div> : <Delivery/>}        
+        </div> : <Delivery id={id}/>}        
       </div>      
     </div>
   );

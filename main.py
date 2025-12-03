@@ -13,8 +13,12 @@ load_dotenv()
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=['http://localhost:3000'],
+    allow_origins=[
+        'http://localhost:3000',
+        "https://effective-waddle-r4pv4vxwv744cxvv5-3000.app.github.dev"
+    ],
     allow_methods=['*'],
+    allow_credentials=True,
     allow_headers=['*'],
 )
 
@@ -39,13 +43,25 @@ class Event(HashModel):
     class Meta:
         database = redis
 
+def build_state(pk: str):
+    pks = Event.all_pks()
+    all_events = [Event.get(pk) for pk in pks]
+    events = [event for event in all_events if event.delivery_id == pk]
+    state = {}
+    for event in events:
+        state = consumers.CONSUMERS[event.type](state, event)
+    return state
+
+
 @app.get('/deliveries/{pk}/status')
 async def get_state(pk: str):
     state = redis.get(f'delivery:{pk}')
     if state:
         return json.loads(state)
-    return {}
-
+    state = build_state(pk)
+    redis.set(f'delivery:{pk}', json.dumps(state))
+    return state
+ 
 
 @app.post('/deliveries/create')
 async def create(request: Request):
