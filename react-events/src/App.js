@@ -3,7 +3,7 @@ import { useState } from 'react';
 import Delivery from './Delivery';
 
 function App() {
-  const [id, setId] = useState('01KBHVPC0XBQN2WNC66BGVV4Z2')
+  const [id, setId] = useState('')
   const submit = async (e) => {
     e.preventDefault(); 
     const form = new FormData(e.target);

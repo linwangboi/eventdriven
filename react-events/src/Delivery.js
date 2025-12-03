@@ -1,17 +1,15 @@
 import React, { useEffect, useState } from "react";
 
-const Delivery = () => {
-    const [state, setState] = useState({
-    "id": "01KBHVPBYQ7ER4A5BRQZ3QB72A",
-    "budget": 50,
-    "notes": "Pick 2 burgers",
-    "status": "ready"
-    });
+const Delivery = (props) => {
+    const [state, setState] = useState({});
+    const [refresh, setRefresh] = useState(false); // what does refresh, setRefreshdo, and why pass in false
     useEffect(() => {
         (async () => {
-            const response = await fetch("https://effective-waddle-r4pv4vxwv744cxvv5-8000.app.github.dev/event")
+            const response = await fetch(`https://effective-waddle-r4pv4vxwv744cxvv5-8000.app.github.dev/deliveries/${props.id}/status`);
+            const data = await response.json();
+            setState(data);
         })()
-    }, [])
+    }, [refresh])
     const submit = async (e, type) => {
         e.preventDefault();
         const form = new FormData(e.target);
@@ -21,15 +19,16 @@ const Delivery = () => {
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({
                 type,
-                data
+                data,
+                delivery_id: state.id,
             })
         });
         if (!response.ok) {
             const {detail} = await response.json();
             alert(detail);
             return;
-        }
-        
+        }       
+        setRefresh(!refresh); // what does this even mean 
     }
     return (
         <div className="row w-100">
@@ -101,6 +100,9 @@ const Delivery = () => {
                     </form>
                 </div>
             </div>
+            <code className="col-12 mt-4">
+                {JSON.stringify(state)}
+            </code>
         </div>
     );
 }
